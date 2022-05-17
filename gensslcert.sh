@@ -1,9 +1,12 @@
 #!/bin/bash
 # Generates SSL Cert | CRT & KEY Valid for 1 year
 
-screenName=`basename "$0"`
+error="💢"
+warning="🚨"
+info="💡"
+success="✅"
 
-if [ -z "$1" ] || [ -z "$2" ]; then echo -e "\n[!]Please provide at least two arguments\n[?]Usage: $screenName... [FQDN] [city]" && exit; fi
+screenName=`basename "$0"`
 
 function gen(){
 openssl req -x509 \
@@ -14,4 +17,13 @@ openssl req -x509 \
             -keyout rootCA.key -out rootCA.crt \
 	    && true || false
 }
-if gen "$1" "$2"; then echo -e "\n[i]Successfully generated thy certificate"; else echo - "[i]Could not generate the certificate for mysterious reasons :O"; fi
+
+err() {
+  echo -e "\n$error : $*" >&2
+}
+
+if [ -z "$1" ] || [ -z "$2" ]; then echo -e "\n$warning : Please provide at least two arguments\n$info : Usage: $screenName... [FQDN] [city]" && exit; fi
+
+if ! gen "$1" "$2"; then err "Could not generate the certificate." && exit; fi 
+
+echo -e "\n$success : The certificate files has been generated."
